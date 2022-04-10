@@ -18,9 +18,9 @@ import (
 const dbPath = "/tmp/badger/"
 const link = "https://www.pravda.com.ua"
 const lastID = "id"
-
 const selector = "body > div.main_content > div.container_middle.layout_main > div.container_sub_news > div.container_sub_news_wrapper > div:nth-child(1) > div.article_header > a"
 
+// Client struct
 type Client struct {
 	client            *http.Client
 	db                *badger.DB
