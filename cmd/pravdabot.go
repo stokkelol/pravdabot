@@ -56,11 +56,15 @@ func (c *Client) Run() {
 		_ = c.db.Close()
 	}()
 
+	go c.runNotifier()
+
+}
+
+func (c *Client) runNotifier() {
 	ticker := time.NewTicker(time.Second * 120)
 	defer ticker.Stop()
 
 	c.run()
-
 	for range ticker.C {
 		c.run()
 	}
