@@ -15,6 +15,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating service: %s", err.Error())
 	}
-
 	client.Run()
 }
