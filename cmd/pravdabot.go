@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -59,6 +61,7 @@ func (c *Client) Run() {
 
 	go c.runNotifier()
 	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
 }
 
