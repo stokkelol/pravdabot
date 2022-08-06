@@ -63,10 +63,10 @@ steps:
       port: 22
       script:
         - sleep 60
-        - docker stop $(docker ps -a -q --filter ancestor=pravdabot --format={{.ID}}) || true
+        - docker stop $(docker ps -a -q --filter ancestor=alexandergulyiy/pravdabot --format={{.ID}}) || true
         - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
         - docker pull alexandergulyiy/pravdabot:latest
-        - docker run -d --rm -e TELEGRAM_BOT_KEY=$TELEGRAM_BOT_KEY -e TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID -p 8082:9000 --volume /etc/badger-pb:/tmp/badger pravdabot
+        - docker run -d --rm -e TELEGRAM_BOT_KEY=$TELEGRAM_BOT_KEY -e TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID -p 8082:9000 --volume /etc/badger-pb:/tmp/badger alexandergulyiy/pravdabot
 
 volumes:
   - name: deps
