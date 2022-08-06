@@ -32,6 +32,7 @@ type Client struct {
 	lastID            string
 }
 
+// New creates new instance of telegram client
 func New() (*Client, error) {
 	var err error
 	c := &Client{}
