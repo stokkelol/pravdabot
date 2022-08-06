@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -18,9 +21,9 @@ import (
 const dbPath = "/tmp/badger/"
 const link = "https://www.pravda.com.ua"
 const lastID = "id"
-
 const selector = "body > div.main_content > div.container_middle.layout_main > div.container_sub_news > div.container_sub_news_wrapper > div:nth-child(1) > div.article_header > a"
 
+// Client struct
 type Client struct {
 	client            *http.Client
 	db                *badger.DB
@@ -56,11 +59,17 @@ func (c *Client) Run() {
 		_ = c.db.Close()
 	}()
 
+	go c.runNotifier()
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	<-ch
+}
+
+func (c *Client) runNotifier() {
 	ticker := time.NewTicker(time.Second * 120)
 	defer ticker.Stop()
 
 	c.run()
-
 	for range ticker.C {
 		c.run()
 	}
