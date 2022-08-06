@@ -42,6 +42,12 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
+      DEPLOY_HOST:
+        from_secret: DEPLOY_HOST
+      SSH_USERNAME:
+        from_secret: SSH_USERNAME
+      SSH_PASSWORD:
+        from_secret: SSH_PASSWORD
     settings:
       envs:
         - TELEGRAM_BOT_KEY
@@ -57,9 +63,9 @@ steps:
       port: 22
       script:
         - sleep 60
-        - docker stop $(docker ps -a -q --filter ancestor=pravdabot --format={{.ID}})
+        - docker stop $(docker ps -a -q --filter ancestor=pravdabot --format={{.ID}}) || true
         - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-        - docker pull alexandergulyiy/pravdabot
+        - docker pull alexandergulyiy/pravdabot:latest
         - docker run -d --rm -e TELEGRAM_BOT_KEY=$TELEGRAM_BOT_KEY -e TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID -p 8082:9000 --volume /etc/badger-pb:/tmp/badger pravdabot
 
 volumes:
