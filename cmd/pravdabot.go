@@ -51,6 +51,7 @@ func New() (*Client, error) {
 	return c, nil
 }
 
+//Run runs :)
 func (c *Client) Run() {
 	if err := c.compareLastID(); err != nil {
 		log.Fatalf("Error getting last id: %s", err.Error())
