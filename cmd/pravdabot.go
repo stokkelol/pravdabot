@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -57,7 +58,8 @@ func (c *Client) Run() {
 	}()
 
 	go c.runNotifier()
-
+	ch := make(chan os.Signal, 1)
+	<-ch
 }
 
 func (c *Client) runNotifier() {
