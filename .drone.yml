@@ -29,38 +29,38 @@ steps:
       event: tag
 
   - name: deploy
-      image: appleboy/drone-ssh
-      when:
-        branch:
-          - main
-      environment:
-        TELEGRAM_BOT_KEY:
-          from_secret: TELEGRAM_BOT_KEY
-        TELEGRAM_CHAT_ID:
-          from_secret: TELEGRAM_CHAT_ID
-        DOCKER_USERNAME:
-          from_secret: DOCKER_USERNAME
-        DOCKER_PASSWORD:
-          from_secret: DOCKER_PASSWORD
-      settings:
-        envs:
-          - TELEGRAM_BOT_KEY
-          - TELEGRAM_CHAT_ID
-          - DOCKER_USERNAME
-          - DOCKER_PASSWORD
-        host:
-          from_secret: DEPLOY_HOST
-        username:
-          from_secret: SSH_USERNAME
-        password:
-          from_secret: SSH_PASSWORD
-        port: 22
-        script:
-          - sleep 60
-          - docker stop $(docker ps -a -q --filter ancestor=pravdabot --format={{.ID}})
-          - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
-          - docker pull alexandergulyiy/pravdabot
-          - docker run -d --rm -e TELEGRAM_BOT_KEY=$TELEGRAM_BOT_KEY -e TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID -p 8082:9000 --volume /etc/badger-pb:/tmp/badger pravdabot
+    image: appleboy/drone-ssh
+    when:
+      branch:
+        - main
+    environment:
+      TELEGRAM_BOT_KEY:
+        from_secret: TELEGRAM_BOT_KEY
+      TELEGRAM_CHAT_ID:
+        from_secret: TELEGRAM_CHAT_ID
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
+    settings:
+      envs:
+        - TELEGRAM_BOT_KEY
+        - TELEGRAM_CHAT_ID
+        - DOCKER_USERNAME
+        - DOCKER_PASSWORD
+      host:
+        from_secret: DEPLOY_HOST
+      username:
+        from_secret: SSH_USERNAME
+      password:
+        from_secret: SSH_PASSWORD
+      port: 22
+      script:
+        - sleep 60
+        - docker stop $(docker ps -a -q --filter ancestor=pravdabot --format={{.ID}})
+        - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+        - docker pull alexandergulyiy/pravdabot
+        - docker run -d --rm -e TELEGRAM_BOT_KEY=$TELEGRAM_BOT_KEY -e TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID -p 8082:9000 --volume /etc/badger-pb:/tmp/badger pravdabot
 
 volumes:
   - name: deps
