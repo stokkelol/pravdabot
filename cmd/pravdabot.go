@@ -12,6 +12,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gojek/heimdall"
+	"github.com/gojek/heimdall/httpclient"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/dgraph-io/badger/v3"
 	tg "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -25,7 +28,7 @@ const selector = "body > div.main_content > div.container_middle.layout_main > d
 
 // Client struct
 type Client struct {
-	client            *http.Client
+	client            heimdall.Client
 	db                *badger.DB
 	tgClient          *tg.BotAPI
 	telegramChannelID int64
@@ -36,7 +39,7 @@ type Client struct {
 func New() (*Client, error) {
 	var err error
 	c := &Client{}
-	c.client = &http.Client{}
+	c.client = createClient()
 	c.db, err = badger.Open(badger.DefaultOptions(dbPath))
 	if err != nil {
 		return nil, err
@@ -68,7 +71,7 @@ func (c *Client) Run() {
 }
 
 func (c *Client) runNotifier() {
-	ticker := time.NewTicker(time.Second * 120)
+	ticker := time.NewTicker(time.Second * 60)
 	defer ticker.Stop()
 
 	c.run()
@@ -94,7 +97,7 @@ func (c *Client) compareLastID() error {
 }
 
 func (c *Client) run() {
-	resp, err := c.client.Get(link)
+	resp, err := c.client.Get(link, nil)
 	if err != nil {
 		log.Fatalf("error reading page: %s", err.Error())
 	}
@@ -136,4 +139,22 @@ func (c *Client) parse(body io.ReadCloser) (string, error) {
 	href, _ := doc.Find(selector).First().Attr("href")
 
 	return href, nil
+}
+
+func createClient() heimdall.Client {
+	backoffInterval := 100 * time.Millisecond
+	maximumJitterInterval := 500 * time.Millisecond
+
+	backoff := heimdall.NewConstantBackoff(backoffInterval, maximumJitterInterval)
+	retrier := heimdall.NewRetrier(backoff)
+
+	timeout := 30 * time.Second
+
+	client := httpclient.NewClient(
+		httpclient.WithHTTPTimeout(timeout),
+		httpclient.WithRetrier(retrier),
+		httpclient.WithRetryCount(4),
+	)
+
+	return client
 }
